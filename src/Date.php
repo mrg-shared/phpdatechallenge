@@ -41,8 +41,8 @@ class Date
 
     private function breakdownDateIntoYearMonthAndDay()
     {
-        $datePartials = (array)$this->date;
-        $dateFormatMap = (array)$this->dateFormat;
+        $datePartials = str_split($this->date);
+        $dateFormatMap = str_split($this->dateFormat);
 
         $year = $month = $day = '';
         foreach ($dateFormatMap as $position => $datePartial) {
