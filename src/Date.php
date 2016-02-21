@@ -96,15 +96,12 @@ class Date
             throw new Exception('Day cannot be extracted');
         }
 
-        $monthsWith30Days = array(4, 6, 9, 11);
-        $monthsWith31Days = array(1, 3, 5, 7, 8, 10, 12);
-
         if (
             $this->day < 1 ||
             ($this->month === 2 && !self::isLeapYear($this->year) && $this->day > 28) ||
             ($this->month === 2 && self::isLeapYear($this->year) && $this->day > 29) ||
-            (in_array($this->month, $monthsWith30Days) && $this->day > 30) ||
-            (in_array($this->month, $monthsWith31Days) && $this->day > 31)
+            (in_array($this->month, self::getMonthsWith30Days()) && $this->day > 30) ||
+            (in_array($this->month, self::getMonthsWith31Days()) && $this->day > 31)
         ) {
             throw new Exception('Invalid day');
         }
@@ -135,8 +132,24 @@ class Date
     }
 
     /**
+     * @return array
+     */
+    public static function getMonthsWith30Days()
+    {
+        return array(4, 6, 9, 11);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMonthsWith31Days()
+    {
+        return array(1, 3, 5, 7, 8, 10, 12);
+    }
+
+    /**
      * @param int $year
-     * @return boolean
+     * @return bool
      */
     public static function isLeapYear($year)
     {
@@ -148,6 +161,22 @@ class Date
             return false;
         } else {
             return true;
+        }
+    }
+
+    /**
+     * @param int $year
+     * @param int $month
+     * @return int
+     */
+    public static function getDaysInMonth($year, $month)
+    {
+        if (in_array($month, self::getMonthsWith30Days())) {
+            return 30;
+        } elseif (in_array($month, self::getMonthsWith31Days())) {
+            return 31;
+        } else {
+            return self::isLeapYear($year) ? 29 : 28;
         }
     }
 }
