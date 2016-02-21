@@ -108,27 +108,19 @@ class Date
     }
 
     /**
+     * @param int $year
+     * @param int $month
      * @return int
      */
-    public function getYear()
+    public static function getDaysInMonth($year, $month)
     {
-        return $this->year;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMonth()
-    {
-        return $this->month;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDay()
-    {
-        return $this->day;
+        if (in_array($month, self::getMonthsWith30Days())) {
+            return 30;
+        } elseif (in_array($month, self::getMonthsWith31Days())) {
+            return 31;
+        } elseif ($month === 2) {
+            return self::isLeapYear($year) ? 29 : 28;
+        }
     }
 
     /**
@@ -165,18 +157,26 @@ class Date
     }
 
     /**
-     * @param int $year
-     * @param int $month
      * @return int
      */
-    public static function getDaysInMonth($year, $month)
+    public function getYear()
     {
-        if (in_array($month, self::getMonthsWith30Days())) {
-            return 30;
-        } elseif (in_array($month, self::getMonthsWith31Days())) {
-            return 31;
-        } else {
-            return self::isLeapYear($year) ? 29 : 28;
-        }
+        return $this->year;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMonth()
+    {
+        return $this->month;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDay()
+    {
+        return $this->day;
     }
 }

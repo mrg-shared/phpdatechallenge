@@ -140,6 +140,7 @@ class DateDiff
         $totalDaysBefore = $this->totalDays;
         
         if ($year === $start->getYear()) {
+            // it's a fraction of a month
             if ($month === $start->getMonth()) {
                 // start and end dates are within the same month and year
                 if ($year === $end->getYear() && $month === $end->getMonth()) {
@@ -151,20 +152,23 @@ class DateDiff
                 } else {
                     $daysDifference = Date::getDaysInMonth($year, $month) - $start->getDay();
                     $this->days += $daysDifference;
-                    $this->totalDays += $daysDifference;
+                    $this->totalDays += $daysDifference - 1;
                 }
 
+            // it's a full month
             } elseif ($month > $start->getMonth()) {
                 $this->months++;
                 $this->totalDays += Date::getDaysInMonth($year, $month);
             }
 
         } elseif ($year === $end->getYear()) {
+            // it's a fraction of a month
             if ($month === $end->getMonth()) {
                 $daysDifference = Date::getDaysInMonth($year, $month) - $end->getDay();
                 $this->days += $daysDifference;
                 $this->totalDays += $daysDifference;
 
+            // it's a full month
             } elseif ($month < $end->getMonth()) {
                 $this->months++;
                 $this->totalDays += Date::getDaysInMonth($year, $month);
