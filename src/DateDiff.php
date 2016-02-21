@@ -62,13 +62,7 @@ class DateDiff
         $start = $this->start;
         $end = $this->end;
 
-        $occurancesOf29Feb = 0;
         for ($year = $start->getYear(); $year <= $end->getYear(); $year++) {
-            $is29FebIncluded = Date::isLeapYear($year) ? $this->is29FebIncludedInYear($year) : false;
-            if ($is29FebIncluded) {
-                $occurancesOf29Feb++;
-            }
-
             if ($this->addFullYear($year)) {
                 continue;
             }
@@ -178,59 +172,6 @@ class DateDiff
         }
 
         return $totalDaysBefore < $this->totalDays ? true : false;
-    }
-
-    /**
-     * @param int $year
-     * @return bool
-     */
-    private function is29FebIncludedInYear($year)
-    {
-        $start = $this->start;
-        $end = $this->end;
-
-        if ($year === $start->getYear()) {
-            // dates diff is for the same calendar year
-            if ($year === $end->getYear()) {
-                if ($this->isAfter29Feb($start)) {
-                    return false;
-                } elseif ($this->isBefore29Feb($end)) {
-                    return false;
-                }
-
-            // dates diff is in two different years
-            } else {
-                if ($this->isAfter29Feb($start)) {
-                    return false;
-                }
-            }
-
-        // dates diff is in two different years
-        } elseif ($year === $end->getYear()) {
-            if ($this->isBefore29Feb($end)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param Date $date
-     * @return bool
-     */
-    private function isAfter29Feb(Date $date)
-    {
-        return $this->formatDateForIso(array($date->getMonth, $date->getDay)) > '0229';
-    }
-
-    /**
-     * @param Date $date
-     * @return bool
-     */
-    private function isBefore29Feb(Date $date)
-    {
-        return $this->formatDateForIso(array($date->getMonth, $date->getDay)) < '0229';
     }
 
     /**
