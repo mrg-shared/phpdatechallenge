@@ -16,7 +16,7 @@ class MyDate
             'months' => $dateDiff->getMonths(),
             'days' => $dateDiff->getDays(),
             'total_days' => $dateDiff->getTotalDays(),
-            'invert' => $dateDiff->getInvert(),
+            'invert' => $dateDiff->isInverted(),
         );
     }
 }

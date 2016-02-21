@@ -101,8 +101,8 @@ class Date
 
         if (
             $this->day < 1 ||
-            ($this->month === 2 && !$this->isLeapYear() && $this->day > 28) ||
-            ($this->month === 2 && $this->isLeapYear() && $this->day > 29) ||
+            ($this->month === 2 && !self::isLeapYear($this->year) && $this->day > 28) ||
+            ($this->month === 2 && self::isLeapYear($this->year) && $this->day > 29) ||
             (in_array($this->month, $monthsWith30Days) && $this->day > 30) ||
             (in_array($this->month, $monthsWith31Days) && $this->day > 31)
         ) {
@@ -135,15 +135,16 @@ class Date
     }
 
     /**
+     * @param int $year
      * @return boolean
      */
-    public function isLeapYear()
+    public static function isLeapYear($year)
     {
-        if ($this->year % 4 !== 0) {
+        if ($year % 4 !== 0) {
             return false;
-        } elseif ($this->year % 100 !== 0) {
+        } elseif ($year % 100 !== 0) {
             return true;
-        } elseif ($this->year % 400 === 0) {
+        } elseif ($year % 400 === 0) {
             return false;
         } else {
             return true;
