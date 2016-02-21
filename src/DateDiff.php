@@ -69,45 +69,115 @@ class DateDiff
                 $occurancesOf29Feb++;
             }
 
+            if ($this->addFullYear($year)) {
+                continue;
+            }
+
             for ($month = 1; $month <= 12; $month++) {
-                if ($year === $start->getYear()) {
-                    if ($month === $start->getMonth()) {
-                        // start and end dates are within the same month and year
-                        if ($year === $end->getYear() && $month === $end->getMonth()) {
-                            $daysDifference = $end->getDay() - $start->getDay;
-                            $this->days += $daysDifference;
-                            $this->totalDays += $daysDifference;
-                            return;
-                        }
-
-                        // start and end are in different months
-                        $daysDifference = Date::getDaysInMonth($year, $month) - $start->getDay();
-                        $this->days += $daysDifference;
-                        $this->totalDays += $daysDifference;
-
-                    } elseif ($month > $start->getMonth()) {
-                        $this->months++;
-                        $this->totalDays += Date::getDaysInMonth($year, $month);
-                    }
-
-                } elseif ($year < $end->getYear()) {
-                    $this->years++;
-                    $this->totalDays += Date::isLeapYear($year) ? 366 : 365;
-
-                } elseif ($year === $end->getYear()) {
-                    if ($month === $end->getMonth()) {
-                        $daysDifference = Date::getDaysInMonth($year, $month) - $end->getDay();
-                        $this->days += $daysDifference;
-                        $this->totalDays += $daysDifference;
-
-                    } elseif ($month < $end->getMonth()) {
-                        $this->months++;
-                        $this->totalDays += Date::getDaysInMonth($year, $month);
-                    }
-
+                if ($this->isMonthToBeIncluded($year, $month)) {
+                    $this->addMonthAndDays($year, $month);
                 }
             }
         }
+    }
+
+    /**
+     * @param int $year
+     * @return bool
+     */
+    private function addFullYear($year)
+    {
+        $start = $this->start;
+        $end = $this->end;
+
+        if ($year > $start->getYear() && $year < $end->getYear()) {
+            $this->years++;
+            $this->totalDays += Date::isLeapYear($year) ? 366 : 365;
+            return true;
+        }
+
+        if ($year > $start->getYear() && self::formatDateForIso(array($start->getMonth(), $start->getDay())) === self::formatDateForIso(array($end->getMonth(), $end->getDay()))) {
+            $this->years++;
+            $this->totalDays += Date::isLeapYear($year) ? 366 : 365;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param int $year
+     * @param int $month
+     * @return bool
+     */
+    private function isMonthToBeIncluded($year, $month)
+    {
+        $start = $this->start;
+        $end = $this->end;
+        
+        if (
+            self::formatDateForIso(array($year, $month)) >= self::formatDateForIso(array($start->getYear(), $start->getMonth())) &&
+            self::formatDateForIso(array($year, $month)) <= self::formatDateForIso(array($end->getYear(), $end->getMonth()))
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param int $year
+     * @param int $month
+     * @return bool
+     */
+    private function addMonthAndDays($year, $month)
+    {
+        $start = $this->start;
+        $end = $this->end;
+        
+        if (
+            self::formatDateForIso(array($year, $month)) > self::formatDateForIso(array($start->getYear(), $start->getMonth())) &&
+            self::formatDateForIso(array($start->getMonth(), $start->getDay())) === self::formatDateForIso(array($end->getMonth(), $end->getDay()))
+        ) {
+            $this->months++;
+            $this->totalDays += Date::getDaysInMonth($year, $month);
+            return true;
+        }
+
+        $totalDaysBefore = $this->totalDays;
+        
+        if ($year === $start->getYear()) {
+            if ($month === $start->getMonth()) {
+                // start and end dates are within the same month and year
+                if ($year === $end->getYear() && $month === $end->getMonth()) {
+                    $daysDifference = $end->getDay() - $start->getDay();
+                    $this->days += $daysDifference;
+                    $this->totalDays += $daysDifference;
+
+                // start and end are in different months
+                } else {
+                    $daysDifference = Date::getDaysInMonth($year, $month) - $start->getDay();
+                    $this->days += $daysDifference;
+                    $this->totalDays += $daysDifference;
+                }
+
+            } elseif ($month > $start->getMonth()) {
+                $this->months++;
+                $this->totalDays += Date::getDaysInMonth($year, $month);
+            }
+
+        } elseif ($year === $end->getYear()) {
+            if ($month === $end->getMonth()) {
+                $daysDifference = Date::getDaysInMonth($year, $month) - $end->getDay();
+                $this->days += $daysDifference;
+                $this->totalDays += $daysDifference;
+
+            } elseif ($month < $end->getMonth()) {
+                $this->months++;
+                $this->totalDays += Date::getDaysInMonth($year, $month);
+            }
+        }
+
+        return $totalDaysBefore < $this->totalDays ? true : false;
     }
 
     /**
